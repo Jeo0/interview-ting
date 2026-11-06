@@ -184,11 +184,15 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 .welcome h3 { margin: 0 0 6px; color: var(--text); font-size: 16px; }
 .welcome ol { margin: 6px 0 0; padding-left: 1.3em; }
 
-.composer { border-top: 1px solid var(--line); padding: 10px 16px 14px; display: flex; flex-direction: column; gap: 8px; }
+.composer { border-top: 1px solid var(--line); padding: 0 16px 14px; display: flex; flex-direction: column; gap: 8px; }
+.composer-grip { height: 14px; margin: 0 -16px; cursor: ns-resize; touch-action: none; display: flex; align-items: center; justify-content: center; }
+.composer-grip::before { content: ""; width: 44px; height: 4px; border-radius: 4px; background: var(--line); transition: background 0.15s, width 0.15s; }
+.composer-grip:hover::before, .composer-grip.dragging::before, .composer-grip:focus-visible::before { background: var(--accent); width: 64px; }
+.composer-grip:focus-visible { outline: none; }
 .interim { min-height: 0; font-size: 13px; color: var(--muted); font-style: italic; }
 .interim:empty { display: none; }
 #input {
-  width: 100%; resize: vertical; min-height: 76px; max-height: 40vh; padding: 10px 12px;
+  width: 100%; resize: vertical; height: 200px; min-height: 90px; padding: 10px 12px; line-height: 1.5;
   border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); color: var(--text); font: inherit;
 }
 #input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }

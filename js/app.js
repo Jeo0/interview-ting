@@ -17,7 +17,7 @@ const el = {
   pageInfo: $("pageInfo"), insertViewBtn: $("insertViewBtn"),
   presBtn: $("presBtn"), timer: $("timer"), presStatus: $("presStatus"), endPresBtn: $("endPresBtn"),
   banner: $("banner"), messages: $("messages"), composer: $("composer"), interim: $("interim"),
-  input: $("input"), micBtn: $("micBtn"), micLabel: $("micLabel"), sendBtn: $("sendBtn"),
+  input: $("input"), grip: $("composerGrip"), micBtn: $("micBtn"), micLabel: $("micLabel"), sendBtn: $("sendBtn"),
   dialog: $("settingsDialog"), form: $("settingsForm"),
   sTitle: $("sTitle"), sMinutes: $("sMinutes"), sSeconds: $("sSeconds"), sMic: $("sMic"),
   sFiles: $("sFiles"), dropzone: $("dropzone"), fileList: $("fileList"), sContext: $("sContext"),
@@ -96,11 +96,14 @@ function beep() {
 // Append text to the message box (speech results, slide markers).
 function appendToInput(text, { line = false } = {}) {
   if (!text) return;
-  const v = el.input.value;
+  let v = el.input.value;
   let sep = "";
-  if (v) {
-    if (line) sep = v.endsWith("\n") ? "" : "\n";
-    else sep = /\s$/.test(v) ? "" : " ";
+  if (line) {
+    // Markers go on their own line with a blank line before them.
+    v = v.replace(/\s+$/, "");
+    sep = v ? "\n\n" : "";
+  } else if (v) {
+    sep = /\s$/.test(v) ? "" : " ";
   }
   el.input.value = v + sep + text + (line ? "\n" : "");
   el.input.scrollTop = el.input.scrollHeight;
@@ -110,6 +113,71 @@ function appendToInput(text, { line = false } = {}) {
     persist();
   }
   updateControls();
+}
+
+// ---------------------------------------------------------------- message box height
+
+const LS_INPUT_H = "interview-ting.inputHeight.v1";
+const INPUT_MIN = 90;
+const INPUT_DEFAULT = 200;
+
+function maxInputHeight() {
+  const chat = el.composer.parentElement;
+  return Math.max(INPUT_MIN, chat.clientHeight - 230);
+}
+
+function setInputHeight(h, save = true) {
+  const clamped = Math.round(Math.min(Math.max(h, INPUT_MIN), maxInputHeight()));
+  el.input.style.height = `${clamped}px`;
+  if (save) {
+    try {
+      localStorage.setItem(LS_INPUT_H, String(clamped));
+    } catch {}
+  }
+}
+
+function initInputResize() {
+  let saved = INPUT_DEFAULT;
+  try {
+    saved = Number(localStorage.getItem(LS_INPUT_H)) || INPUT_DEFAULT;
+  } catch {}
+  setInputHeight(saved, false);
+
+  // Drag the grip above the box (dragging up makes it taller).
+  const grip = el.grip;
+  let startY = 0;
+  let startH = 0;
+  const move = (e) => setInputHeight(startH + (startY - e.clientY), false);
+  const up = (e) => {
+    grip.releasePointerCapture?.(e.pointerId);
+    grip.removeEventListener("pointermove", move);
+    grip.removeEventListener("pointerup", up);
+    grip.classList.remove("dragging");
+    setInputHeight(el.input.offsetHeight);
+  };
+  grip.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    startY = e.clientY;
+    startH = el.input.offsetHeight;
+    grip.setPointerCapture?.(e.pointerId);
+    grip.classList.add("dragging");
+    grip.addEventListener("pointermove", move);
+    grip.addEventListener("pointerup", up);
+  });
+  grip.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      e.preventDefault();
+      setInputHeight(el.input.offsetHeight + (e.key === "ArrowUp" ? 24 : -24));
+    }
+  });
+  grip.addEventListener("dblclick", () => setInputHeight(INPUT_DEFAULT));
+
+  // The textarea's own corner handle works too; remember what it's set to.
+  el.input.addEventListener("pointerup", () => {
+    const h = el.input.offsetHeight;
+    if (Math.abs(h - (Number(localStorage.getItem(LS_INPUT_H)) || 0)) > 2) setInputHeight(h);
+  });
+  window.addEventListener("resize", () => setInputHeight(el.input.offsetHeight, false));
 }
 
 // ---------------------------------------------------------------- speech
@@ -1016,6 +1084,7 @@ async function boot() {
   const saved = loadActiveId();
   state.activeId = state.sessions.some((s) => s.id === saved) ? saved : state.sessions[0].id;
   bindEvents();
+  initInputResize();
   await loadActiveSession();
   if (!state.global.seenWelcome) {
     state.global.seenWelcome = true;

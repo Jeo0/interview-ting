@@ -53,8 +53,10 @@
       <div class="banner" id="banner" role="status" hidden></div>
       <div class="messages" id="messages" aria-live="polite"></div>
       <form class="composer" id="composer" autocomplete="off">
+        <div class="composer-grip" id="composerGrip" role="separator" aria-orientation="horizontal" tabindex="0"
+             aria-label="Resize message box (drag, or use the up and down arrow keys)" title="Drag to resize the message box · double-click to reset"></div>
         <div class="interim" id="interim" aria-live="polite"></div>
-        <textarea id="input" rows="3" placeholder="Type your message, or press the microphone and speak…" aria-label="Message"></textarea>
+        <textarea id="input" rows="8" placeholder="Type your message, or press the microphone and speak…" aria-label="Message"></textarea>
         <div class="composer-actions">
           <button class="btn mic-btn" id="micBtn" type="button" aria-pressed="false" aria-label="Microphone (speech to text)" title="Microphone (speech to text)">
             <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
