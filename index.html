@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Interview Ting</title>
+  <meta name="description" content="Rehearse a thesis defense or interview: present your slides with speech-to-text, then answer a critical AI panel.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f5d50'/%3E%3Cpath d='M16 7a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0v-6a4 4 0 0 1 4-4zm-7 10h2a5 5 0 0 0 10 0h2a7 7 0 0 1-6 6.9V27h-2v-3.1A7 7 0 0 1 9 17z' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="vendor/pdf-3.11.174.min.js"></script>
+  <script src="vendor/jszip-3.10.1.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>Interview Ting</span>
+    </div>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Interview sessions"></nav>
+    <button class="btn btn-ghost" id="newSessionBtn" type="button">+ New interview</button>
+    <button class="btn btn-ghost" id="settingsBtn" type="button" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>
+      <span>Interview settings</span>
+    </button>
+  </header>
+
+  <main class="layout">
+    <section class="viewer" id="viewer" aria-label="Presentation files">
+      <div class="file-tabs" id="fileTabs" role="tablist" aria-label="Files"></div>
+      <div class="stage" id="stage"></div>
+      <div class="viewer-controls">
+        <button class="btn icon-btn" id="prevBtn" type="button" aria-label="Previous slide or page" title="Previous (← / Page Up)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <span class="page-info" id="pageInfo">No file</span>
+        <button class="btn icon-btn" id="nextBtn" type="button" aria-label="Next slide or page" title="Next (→ / Page Down)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="btn btn-ghost small" id="insertViewBtn" type="button" title="Add what's on screen to the message box">Insert current view</button>
+      </div>
+    </section>
+
+    <section class="chat" aria-label="Interview chat">
+      <div class="pres-bar" id="presBar">
+        <button class="btn btn-primary" id="presBtn" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+          <span>Start presentation</span>
+        </button>
+        <div class="timer" id="timer" role="timer" aria-live="off">10:00</div>
+        <span class="pres-status" id="presStatus"></span>
+        <button class="btn btn-ghost small" id="endPresBtn" type="button" hidden>End presentation</button>
+      </div>
+      <div class="banner" id="banner" role="status" hidden></div>
+      <div class="messages" id="messages" aria-live="polite"></div>
+      <form class="composer" id="composer" autocomplete="off">
+        <div class="interim" id="interim" aria-live="polite"></div>
+        <textarea id="input" rows="3" placeholder="Type your message, or press the microphone and speak…" aria-label="Message"></textarea>
+        <div class="composer-actions">
+          <button class="btn mic-btn" id="micBtn" type="button" aria-pressed="false" aria-label="Microphone (speech to text)" title="Microphone (speech to text)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+          </button>
+          <span class="mic-label" id="micLabel">Mic off</span>
+          <button class="btn btn-primary send-btn" id="sendBtn" type="submit">
+            <span>Send</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l16-8-6 16-2-7z"/></svg>
+          </button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <dialog id="settingsDialog" class="settings" aria-labelledby="settingsTitle">
+    <form method="dialog" id="settingsForm">
+      <header class="settings-head">
+        <h2 id="settingsTitle">Interview settings</h2>
+        <button class="btn icon-btn" value="close" aria-label="Close settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </header>
+
+      <div class="settings-body">
+        <fieldset>
+          <legend>This interview</legend>
+          <label class="field">
+            <span>Interview name</span>
+            <input id="sTitle" type="text" maxlength="60">
+          </label>
+
+          <div class="field">
+            <span>Presentation countdown timer</span>
+            <div class="row">
+              <label class="inline"><input id="sMinutes" type="number" min="0" max="180" step="1"> min</label>
+              <label class="inline"><input id="sSeconds" type="number" min="0" max="59" step="5"> sec</label>
+            </div>
+          </div>
+
+          <label class="check">
+            <input id="sMic" type="checkbox">
+            <span><strong>Microphone (speech to text)</strong><br><small>Turns the mic on when the presentation starts and again after each interviewer reply. You can always edit the text before sending.</small></span>
+          </label>
+
+          <label class="field">
+            <span>Speech language</span>
+            <select id="gLang">
+              <option value="en-US">English (United States)</option>
+              <option value="en-PH">English (Philippines)</option>
+              <option value="fil-PH">Filipino</option>
+              <option value="en-GB">English (United Kingdom)</option>
+            </select>
+          </label>
+
+          <div class="field">
+            <span>Files to present (slides, thesis, boards)</span>
+            <label class="dropzone" id="dropzone">
+              <input id="sFiles" type="file" multiple>
+              <span><strong>Choose files</strong> or drop them here<br><small>PDF, PowerPoint (.pptx), Word (.docx), images, text. For exact slide visuals, export your deck to PDF.</small></span>
+            </label>
+            <ul class="file-list" id="fileList"></ul>
+          </div>
+
+          <label class="field">
+            <span>Interview context <small>(optional)</small></span>
+            <textarea id="sContext" rows="3" placeholder="e.g. Undergraduate architecture thesis defense at UST. Topic: flood-resilient public school in Malabon. Panel is strict about structure and code compliance."></textarea>
+          </label>
+
+          <details class="field">
+            <summary>Interviewer persona</summary>
+            <textarea id="sPersona" rows="6"></textarea>
+            <button class="btn btn-ghost small" type="button" id="resetPersonaBtn">Reset to architecture master</button>
+          </details>
+        </fieldset>
+
+        <fieldset>
+          <legend>Connection <small>(shared by all interviews)</small></legend>
+          <label class="field">
+            <span>Anthropic API key</span>
+            <input id="gKey" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…">
+            <small>Stored only in this browser and sent only to api.anthropic.com. Use a key with a spending limit.</small>
+          </label>
+          <div class="row">
+            <label class="field grow">
+              <span>Interviewer model</span>
+              <select id="gModel"></select>
+            </label>
+            <label class="field">
+              <span>Rigor (effort)</span>
+              <select id="gEffort">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="xhigh">Extra high</option>
+              </select>
+            </label>
+          </div>
+          <label class="field">
+            <span>MCP server URL</span>
+            <input id="gMcpUrl" type="url" placeholder="https://interview-files-mcp.your-name.workers.dev" spellcheck="false">
+          </label>
+          <label class="field">
+            <span>MCP server token</span>
+            <input id="gMcpToken" type="password" autocomplete="off" spellcheck="false">
+          </label>
+          <div class="row">
+            <button class="btn btn-ghost small" type="button" id="testMcpBtn">Test MCP connection</button>
+            <span class="hint" id="mcpStatus"></span>
+          </div>
+          <label class="field">
+            <span>How the interviewer reads your files</span>
+            <select id="gDelivery">
+              <option value="auto">Automatic (MCP if configured, otherwise attach)</option>
+              <option value="mcp">MCP connector</option>
+              <option value="direct">Attach files directly</option>
+              <option value="both">Both (MCP + attached visuals)</option>
+            </select>
+          </label>
+          <label class="check">
+            <input id="gWeb" type="checkbox">
+            <span>Let the interviewer use web search to fact-check claims</span>
+          </label>
+        </fieldset>
+      </div>
+
+      <footer class="settings-foot">
+        <button class="btn btn-danger small" type="button" id="deleteSessionBtn">Delete this interview</button>
+        <button class="btn btn-primary" value="done">Done</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <div class="countdown" id="countdown" hidden aria-live="assertive"></div>
+  <div class="toast" id="toast" role="alert" hidden></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

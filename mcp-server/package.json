@@ -1,0 +1,15 @@
+{
+  "name": "interview-files-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Tiny MCP server that serves an interviewee's uploaded files to Claude via the Anthropic MCP connector.",
+  "scripts": {
+    "start": "node node-server.mjs",
+    "test": "node test.mjs",
+    "deploy": "npx wrangler deploy"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

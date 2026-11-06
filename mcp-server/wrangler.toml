@@ -1,0 +1,15 @@
+name = "interview-files-mcp"
+main = "worker.mjs"
+compatibility_date = "2026-10-01"
+
+# Create the namespace with:  npx wrangler kv namespace create FILES
+# then paste the id it prints below.
+[[kv_namespaces]]
+binding = "FILES"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+[vars]
+# Lock CORS to your GitHub Pages origin, e.g. "https://your-name.github.io"
+ALLOW_ORIGIN = "*"
+
+# Set the shared secret with:  npx wrangler secret put MCP_TOKEN
