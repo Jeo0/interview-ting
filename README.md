@@ -80,19 +80,15 @@ Files are stored as JSON under `mcp-server/data/`. To reach it from Anthropic wh
 
 Test it with `cd mcp-server && node test.mjs`.
 
-## Deploy to GitHub Pages
-
-The workflow in `.github/workflows/pages.yml` publishes `index.html`, `css/`, `js/` and `vendor/` on every push to `main`. In the repository, go to **Settings → Pages → Build and deployment** and set **Source** to **GitHub Actions**.
-
-There's no build step. To run it locally, serve the folder with any static server:
-
-```bash
-python3 -m http.server 8000
-```
-
 ## Details
 
 - Model: `claude-opus-5-5` by default, with adaptive thinking and a selectable effort level (*Rigor*). Sonnet 5.5 and Haiku 5.5 can be chosen in settings. Opus and Sonnet requests opt into Anthropic's server-side refusal fallback (`fallbacks: "default"`).
 - The conversation history is append-only and sent back unchanged each turn, including thinking blocks and MCP tool calls, with prompt caching on.
 - The interviewer ends its final assessment with `<<INTERVIEW_COMPLETE>>`. The app hides that marker, shows a "ready" banner and stops turning the mic on automatically.
 - Libraries are vendored in `vendor/`: the Anthropic TypeScript SDK 1.2.0 (bundled for the browser), pdf.js 3.11.174 and JSZip 3.10.1. Their licenses are in the same folder.
+
+There's no build step. To run it locally, serve the folder with any static server:
+
+```bash
+python3 -m http.server 8000
+```
