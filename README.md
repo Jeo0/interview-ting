@@ -55,7 +55,14 @@ npx wrangler secret put MCP_TOKEN
 npx wrangler deploy
 ```
 
-In the app, set **MCP server URL** to `https://interview-files-mcp.<you>.workers.dev` and **MCP server token** to the same secret, then press **Test MCP connection**.
+Then connect the app to it:
+
+1. Open the web app and click **Interview settings** (top right).
+2. Scroll to the **Connection** section.
+3. In **MCP server URL**, enter your Worker's address: `https://interview-files-mcp.<your-subdomain>.workers.dev`.
+4. In **MCP server token**, enter the exact value you typed for `wrangler secret put MCP_TOKEN`.
+5. Click **Test MCP connection**. It should say `Connected — tools: list_files, read_file, search_files`.
+6. Click **Done**. Files you add from then on are uploaded to the server automatically.
 
 ### Option B: any Node 18+ host
 
