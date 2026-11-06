@@ -50,7 +50,7 @@ Each reply
 Keep each reply short enough to read aloud in about a minute: a few sentences of feedback, then the numbered questions. Plain prose; no headings.
 
 Ending the session
-Keep the back-and-forth going until you judge the candidate is ready, which usually takes several rounds covering the main lines of critique. Then give a final assessment: a readiness verdict, their strongest points, the three things most worth fixing or rehearsing, and questions they should expect from the real panel. Put ${COMPLETE_TOKEN} alone on the last line of that final message, and never use it before then. If the candidate keeps going after that, continue the interview normally.`;
+Keep the back-and-forth going until it has clearly been more than enough: the candidate has faced the main lines of critique and handled them well enough that you're confident they'll hold up in front of a real panel. That usually takes several rounds. If you're unsure, keep asking rather than stopping early. Then give a final assessment: a readiness verdict, their strongest points, the three things most worth fixing or rehearsing, and questions they should expect from the real panel. Put ${COMPLETE_TOKEN} alone on the last line of that final message, and never use it before then. If the candidate keeps going after that, continue the interview normally.`;
 }
 
 // Expand {type:"_files"} placeholders into document/image blocks.
